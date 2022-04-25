@@ -9,21 +9,32 @@ pipeline {
           description: 'The name of the job the triggering upstream build'
     )
 }
-
-
-  stages {
     stage('Copy artifact') {
       steps {
-        copyArtifacts filter: 'sample', fingerprintArtifacts: true,
+        copyArtifacts filter: 'sample1', fingerprintArtifacts: true,
           projectName: "sample-multibranch/${params.upstreamJobName}", selector: upstream()
       }
     }
     stage('Deliver') {
       steps {
-          sshagent(['vagrant-private-key']) {
+        sshagent(['vagrant-private-key']) {
           sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${DEPLOY_TO}.ini playbook.yml'
         }
       }
+
+//   stages {
+//     stage('Copy artifact') {
+//       steps {
+//         copyArtifacts filter: 'sample', fingerprintArtifacts: true,
+//           projectName: "sample-multibranch/${params.upstreamJobName}", selector: upstream()
+//       }
+//     }
+//     stage('Deliver') {
+//       steps {
+//           sshagent(['vagrant-private-key']) {
+//           sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${DEPLOY_TO}.ini playbook.yml'
+//         }
+//       }
     }
 
   }
